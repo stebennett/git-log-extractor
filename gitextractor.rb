@@ -5,6 +5,8 @@ require 'git'
 require 'logger'
 require 'csv'
 
+CSV_HEADERS = ["Commit Timestamp", "Commit SHA", "Author Nme", "Author Email", "Commit Message", "Filename"]
+
 directory = nil
 outputfile = 'output.csv'
 since = '1970-01-01'
@@ -27,7 +29,9 @@ end
 g = Git.open(directory)
 commits = g.log(count).since(since)
 
-csvfile = CSV.open(outputfile, 'w', {:force_quotes => true})
+csvfile = CSV.open(outputfile, 'w', :force_quotes => true)
+csvfile << CSV_HEADERS
+
 $i = 0
 while $i < commits.size() do
   current_commit = commits[$i]
