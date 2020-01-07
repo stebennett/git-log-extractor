@@ -5,7 +5,7 @@ require 'git'
 require 'logger'
 require 'csv'
 
-CSV_HEADERS = ["Commit Timestamp", "Commit SHA", "Author Nme", "Author Email", "Commit Message", "Filename", "Jira Ticket"]
+CSV_HEADERS = ["Repository", "Commit Timestamp", "Commit SHA", "Author Nme", "Author Email", "Commit Message", "Filename", "Jira Ticket"]
 
 directory = nil
 outputfile = 'output.csv'
@@ -27,6 +27,7 @@ end
 
 # Get commits
 g = Git.open(directory)
+repository = g.remote.url
 commits = g.log(count).since(since)
 
 csvfile = CSV.open(outputfile, 'w', :force_quotes => true)
@@ -44,7 +45,7 @@ while $i < commits.size() do
       jira_tickets = ['']
     end
     jira_tickets.each { |jira_ticket|
-      csvfile << [commits[$i].author_date.strftime('%Y-%m-%dT%H:%M:%S.%L%z'), commits[$i].sha, commits[$i].author.name, commits[$i].author.email, commits[$i].message, file[0], jira_ticket] 
+      csvfile << [repository, commits[$i].author_date.strftime('%Y-%m-%dT%H:%M:%S.%L%z'), commits[$i].sha, commits[$i].author.name, commits[$i].author.email, commits[$i].message, file[0], jira_ticket] 
       puts "Processing commit #{commits[$i].sha} on #{file[0]}"
     }
   }
