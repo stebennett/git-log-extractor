@@ -5,7 +5,7 @@ require 'git'
 require 'logger'
 require 'csv'
 
-CSV_HEADERS = ["Commit Timestamp", "Commit SHA", "Author Nme", "Author Email", "Commit Message", "Filename"]
+CSV_HEADERS = ["Commit Timestamp", "Commit SHA", "Author Nme", "Author Email", "Commit Message", "Filename", "Jira Ticket"]
 
 directory = nil
 outputfile = 'output.csv'
@@ -37,9 +37,16 @@ while $i < commits.size() do
   current_commit = commits[$i]
   prev_commit = commits[$i+1]
   diff = g.diff(current_commit, prev_commit)
+
   diff.stats[:files].each { |file|
-      csvfile << [commits[$i].author_date.strftime('%Y-%m-%dT%H:%M:%S.%L%z'), commits[$i].sha, commits[$i].author.name, commits[$i].author.email, commits[$i].message, file[0]]
-      puts "Processing commit #{commits[$i].sha}"
+    jira_tickets = commits[$i].message.scan(/[A-Z]+\-[0-9]+/)
+    if jira_tickets.empty?
+      jira_tickets = ['']
+    end
+    jira_tickets.each { |jira_ticket|
+      csvfile << [commits[$i].author_date.strftime('%Y-%m-%dT%H:%M:%S.%L%z'), commits[$i].sha, commits[$i].author.name, commits[$i].author.email, commits[$i].message, file[0], jira_ticket] 
+      puts "Processing commit #{commits[$i].sha} on #{file[0]}"
+    }
   }
   $i += 1
 end
