@@ -1,3 +1,3 @@
 source 'https://rubygems.org'
 
-gem 'git', '~> 1.5'
+gem 'git', '~> 1.13'
